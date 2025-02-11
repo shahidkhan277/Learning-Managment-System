@@ -11,7 +11,7 @@ use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
-    
+
     public function register(Request $request)
     {
         // Validate incoming request
@@ -64,5 +64,13 @@ class UserController extends Controller
             'user' => $user,
             'token' => $token,
         ]);
+    }
+
+    public function logout(Request $request)
+    {
+        // Revoke the user's current token
+        $request->user()->tokens()->delete();
+
+        return response()->json(['message' => 'Logged out successfully']);
     }
 }

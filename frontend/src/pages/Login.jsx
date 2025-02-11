@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import InputField from "../components/InputField";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import axiosClient from "../axiosClient";
+import { loginSuccess } from "../store/authSlice";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -15,50 +18,52 @@ const Login = () => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrors({});
-    setServerError("");
-    setLoading(true);
   
-    let newErrors = {};
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.password) newErrors.password = "Password is required";
-  
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      setLoading(false);
-      return;
-    }
-  
-    try {
-      // 1️⃣ Request CSRF token before login
-      await axios.get("http://localhost:8000/sanctum/csrf-cookie", {
-        withCredentials: true, // Important for Laravel Sanctum
-      });
-  
-      // 2️⃣ Now send the login request
-      const response = await axios.post(
-        "http://localhost:8000/api/login",
-        formData,
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true, // Crucial for Sanctum authentication
-        }
-      );
-  
-      // 3️⃣ Store user info in localStorage
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-  
-      navigate("/"); // Redirect to Dashboard
-    } catch (error) {
-      console.error("Login error:", error.response?.data);
-      setServerError(error.response?.data?.message || "Login failed. Try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+const dispatch = useDispatch(); // Initialize Redux dispatch
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setErrors({});
+  setServerError("");
+  setLoading(true);
+
+  let newErrors = {};
+  if (!formData.email) newErrors.email = "Email is required";
+  if (!formData.password) newErrors.password = "Password is required";
+
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    setLoading(false);
+    return;
+  }
+
+  try {
+    await axios.get("http://localhost:8000/sanctum/csrf-cookie", {
+      withCredentials: true,
+    });
+
+    const response = await axiosClient.post(
+      "/login",
+      formData,
+      {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      }
+    );
+
+    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("user", JSON.stringify(response.data.user));
+
+    dispatch(loginSuccess(response.data.user)); // ✅ Update Redux state
+
+    navigate("/"); // ✅ Redirect to Dashboard
+  } catch (error) {
+    console.error("Login error:", error.response?.data);
+    setServerError(error.response?.data?.message || "Login failed. Try again.");
+  } finally {
+    setLoading(false);
+  }
+};
   
 
   return (

@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import InputField from "../components/InputField"; // Adjust path if needed
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-
+import axiosClient from "../axiosClient"; // Adjust path if needed
 const Signup = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -36,7 +35,7 @@ const Signup = () => {
     setErrors({});
     
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/register", formData, {
+      const response = await axiosClient.post("/register", formData, {
         headers: { "Content-Type": "application/json" },
       });
       
