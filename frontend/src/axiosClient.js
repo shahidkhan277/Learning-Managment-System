@@ -5,6 +5,10 @@ const axiosClient = axios.create({
   withCredentials: true, // Important for Laravel Sanctum
 });
 
+
+export const initializeCsrfToken = async () => {
+  await axiosClient.get("http://localhost:8000/sanctum/csrf-cookie"); // Ensures the token is fetched before API calls
+};
 // 🔹 Request Interceptor: Attach Bearer Token
 axiosClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
@@ -22,7 +26,8 @@ axiosClient.interceptors.response.use(
       if (error.response.status === 401) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        window.location.href = "/login"; 
+        console.log(" Logging out..." , error.response);
+        // window.location.href = "/login"; 
       }
     }
     return Promise.reject(error);

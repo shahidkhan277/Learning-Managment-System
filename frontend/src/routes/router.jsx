@@ -5,6 +5,8 @@ import Dashboard from "../pages/Dashboard";
 import ProtectedLayout from "../layouts/ProtectedLayout";
 import NotFound from "../components/NotFound";
 import PublicLayout from "../layouts/PublicLayout";
+import Permissions from "../pages/Permissions";
+import CreatePermissions from "../components/CreatePermissions";
 
 const router = createBrowserRouter([
     {
@@ -18,6 +20,14 @@ const router = createBrowserRouter([
             {
                 path: "/dashboard",
                 element: <Dashboard />,
+            },
+            {
+                path: "/settings/permissions",
+                element: <Permissions />,
+            },
+            {
+                path: "/settings/permissions/create",
+                element: <CreatePermissions />,
             },
         ],
     },

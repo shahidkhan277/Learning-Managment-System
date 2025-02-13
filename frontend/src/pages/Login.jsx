@@ -50,12 +50,13 @@ const handleSubmit = async (e) => {
         withCredentials: true,
       }
     );
-
     localStorage.setItem("token", response.data.token);
     localStorage.setItem("user", JSON.stringify(response.data.user));
 
-    dispatch(loginSuccess(response.data.user)); // ✅ Update Redux state
-
+    dispatch(loginSuccess({
+      user: response.data.user,
+      token: response.data.token, // Pass the token here
+    }));
     navigate("/"); // ✅ Redirect to Dashboard
   } catch (error) {
     console.error("Login error:", error.response?.data);
